@@ -287,6 +287,16 @@ const Home = () => {
     });
   };
 
+  const handlePersonalInfoChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      personalInfo: {
+        ...prev.personalInfo,
+        [field]: value,
+      },
+    }));
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case STEPS.PERSONAL:
@@ -865,27 +875,32 @@ const Home = () => {
             title="Review Your Resume"
             subtitle="Make sure everything is correct"
           >
-            {showPreview ? (
-              <ResumePreview
-                formData={formData}
-                photoPreview={photoPreview}
-                onClose={() => setShowPreview(false)}
-              />
-            ) : (
-              <div className="space-y-6">
-                <p className="text-gray-600">
-                  Click the button below to preview your resume before
-                  exporting.
-                </p>
-                <button
-                  onClick={() => setShowPreview(true)}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg
-                    hover:bg-blue-700 transition-colors"
-                >
-                  Preview Resume
-                </button>
-              </div>
-            )}
+            <div className="space-y-6">
+              {showPreview ? (
+                <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
+                  <ResumePreview
+                    formData={formData}
+                    photoPreview={photoPreview}
+                    onClose={() => setShowPreview(false)}
+                  />
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-600 mb-4">
+                    Click the button below to preview your resume before
+                    exporting.
+                  </p>
+                  <button
+                    onClick={() => setShowPreview(true)}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-lg
+                      hover:bg-blue-700 transition-colors inline-flex items-center"
+                  >
+                    <HiOutlineDocumentAdd className="w-5 h-5 mr-2" />
+                    Preview Resume
+                  </button>
+                </div>
+              )}
+            </div>
           </StepContainer>
         );
 
@@ -1022,7 +1037,7 @@ const Home = () => {
             </button>
           )}
 
-          {currentStep < STEPS.REVIEW ? (
+          {currentStep < STEPS.REVIEW && (
             <button
               onClick={handleNext}
               className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg
@@ -1030,15 +1045,6 @@ const Home = () => {
             >
               Next
               <FiChevronRight className="w-5 h-5 ml-2" />
-            </button>
-          ) : (
-            <button
-              onClick={() => console.log("Export")}
-              className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg
-                shadow-sm hover:bg-green-700 transition-colors ml-auto"
-            >
-              <HiOutlineDocumentAdd className="w-5 h-5 mr-2" />
-              Export PDF
             </button>
           )}
         </div>

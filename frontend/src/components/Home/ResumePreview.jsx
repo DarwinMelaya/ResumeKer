@@ -1,222 +1,342 @@
-import React from "react";
+import React, { useRef } from "react";
+import { usePDF } from "react-to-pdf";
 
 const ResumePreview = ({ formData, photoPreview, onClose }) => {
-  // Helper function to check if a skill category has any non-empty values
-  const hasSkills = (category) => {
-    return formData.technicalSkills[category].some(
-      (skill) => skill.trim() !== ""
-    );
+  const targetRef = useRef(null);
+  const { toPDF, targetRef: pdfRef } = usePDF({
+    filename: `${formData.personalInfo.fullName || "Resume"}.pdf`,
+    page: {
+      format: "a4",
+      orientation: "portrait",
+      margin: 0,
+    },
+    method: "save",
+  });
+
+  const handleDownloadPDF = async () => {
+    try {
+      await toPDF();
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white max-w-4xl w-full mx-auto p-8 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-3xl font-bold uppercase">
-              {formData.personalInfo.fullName || "YOUR NAME"}
-            </h1>
-            <p className="text-sm mt-1">
-              {formData.personalInfo.address || "Your Address"}
-            </p>
-            <p className="text-sm">
-              {formData.personalInfo.phone || "Your Phone"}
-            </p>
-            <p className="text-sm">
-              {formData.personalInfo.email || "Your Email"}
-            </p>
-            <p className="text-sm">
-              {formData.personalInfo.github || "Your GitHub"}
-            </p>
-          </div>
-          <div className="w-32 h-40 bg-gray-200 flex items-center justify-center">
-            {photoPreview ? (
-              <img
-                src={photoPreview}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-gray-500 text-sm text-center">Photo</span>
-            )}
+        <div ref={pdfRef} style={{ backgroundColor: "white" }}>
+          <style>
+            {`
+              @page {
+                margin: 0;
+                size: A4;
+              }
+              
+              .resume-content {
+                width: 210mm;
+                min-height: 297mm;
+                padding: 20mm;
+                margin: 0;
+                font-family: 'Helvetica', 'Arial', sans-serif;
+                line-height: 1.6;
+                color: #2d3748;
+                box-sizing: border-box;
+                background-color: white;
+              }
+
+              .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 6mm;
+                border-bottom: 2px solid #3182ce;
+                padding-bottom: 6mm;
+              }
+
+              .personal-info h1 {
+                font-size: 24pt;
+                font-weight: 700;
+                margin-bottom: 3mm;
+                color: #1a202c;
+                letter-spacing: 0.5px;
+              }
+
+              .personal-info p {
+                font-size: 10pt;
+                margin-bottom: 1.5mm;
+                color: #4a5568;
+                line-height: 1.4;
+              }
+
+              .section-title {
+                font-size: 14pt;
+                font-weight: 700;
+                color: #2d3748;
+                margin-bottom: 4mm;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 2mm;
+              }
+
+              .section {
+                margin-bottom: 6mm;
+                page-break-inside: avoid;
+              }
+
+              .education-item {
+                margin-bottom: 4mm;
+              }
+
+              .education-item h3 {
+                font-size: 11pt;
+                font-weight: 600;
+                color: #2d3748;
+                margin-bottom: 1mm;
+              }
+
+              .education-item p {
+                font-size: 10pt;
+                margin-bottom: 1mm;
+                color: #4a5568;
+              }
+
+              .experience-item {
+                margin-bottom: 5mm;
+                page-break-inside: avoid;
+              }
+
+              .experience-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 2mm;
+              }
+
+              .experience-title {
+                font-weight: 600;
+                font-size: 11pt;
+                color: #2d3748;
+              }
+
+              .experience-period {
+                font-size: 10pt;
+                color: #718096;
+              }
+
+              .responsibilities {
+                list-style-type: disc;
+                margin-left: 5mm;
+                margin-top: 2mm;
+              }
+
+              .responsibilities li {
+                font-size: 10pt;
+                margin-bottom: 1mm;
+                color: #4a5568;
+                line-height: 1.4;
+              }
+
+              .photo-container {
+                width: 35mm;
+                height: 45mm;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              }
+
+              .photo-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+
+              .skills-section {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 5mm;
+                margin-top: 3mm;
+              }
+
+              .skill-item {
+                margin-bottom: 3mm;
+              }
+
+              .skill-title {
+                font-weight: 600;
+                font-size: 10pt;
+                margin-bottom: 1mm;
+                color: #2d3748;
+              }
+
+              .skill-list {
+                font-size: 10pt;
+                color: #4a5568;
+                line-height: 1.4;
+              }
+
+              .reference-item {
+                margin-bottom: 4mm;
+                padding: 3mm;
+                background: #f7fafc;
+                border-radius: 2mm;
+              }
+
+              .reference-item h3 {
+                font-size: 11pt;
+                font-weight: 600;
+                margin-bottom: 1mm;
+                color: #2d3748;
+              }
+
+              .reference-item p {
+                font-size: 10pt;
+                margin-bottom: 1mm;
+                color: #4a5568;
+                line-height: 1.4;
+              }
+
+              .location-text {
+                font-style: italic;
+                text-align: right;
+                font-size: 10pt;
+                color: #718096;
+              }
+
+              @media print {
+                .resume-content {
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                }
+              }
+            `}
+          </style>
+
+          <div className="resume-content">
+            <div className="header">
+              <div className="personal-info">
+                <h1>{formData.personalInfo.fullName}</h1>
+                <p>{formData.personalInfo.address}</p>
+                <p>{formData.personalInfo.phone}</p>
+                <p>{formData.personalInfo.email}</p>
+                <p>{formData.personalInfo.github}</p>
+              </div>
+              {photoPreview && (
+                <div className="photo-container">
+                  <img src={photoPreview} alt="Profile" />
+                </div>
+              )}
+            </div>
+
+            <div className="section">
+              <h2 className="section-title">Objectives</h2>
+              <p style={{ fontSize: "12px" }}>{formData.objective}</p>
+            </div>
+
+            <div className="section">
+              <h2 className="section-title">Education</h2>
+              {formData.education.map((edu, index) => (
+                <div key={index} className="education-item">
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <div>
+                      <h3>{edu.school}</h3>
+                      <p>
+                        {edu.degree} - {edu.major}
+                      </p>
+                    </div>
+                    <p className="location-text">
+                      {edu.location}
+                      <br />
+                      {edu.period}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="section">
+              <h2 className="section-title">Work Experience</h2>
+              {formData.workExperience.map((work, index) => (
+                <div key={index} className="experience-item">
+                  <div className="experience-header">
+                    <span className="experience-title">{work.company}</span>
+                    <span className="experience-period">{work.period}</span>
+                  </div>
+                  <p style={{ fontSize: "12px", fontWeight: "bold" }}>
+                    {work.title}
+                  </p>
+                  <ul className="responsibilities">
+                    {work.responsibilities.map((resp, idx) => (
+                      <li key={idx}>{resp}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div className="section">
+              <h2 className="section-title">Technical Skills</h2>
+              <div className="skills-section">
+                {Object.entries(formData.technicalSkills).map(
+                  ([key, value]) => {
+                    if (
+                      Array.isArray(value) &&
+                      value.some((item) => item.trim() !== "")
+                    ) {
+                      return (
+                        <div key={key} className="skill-item">
+                          <div className="skill-title">
+                            {key.replace(/([A-Z])/g, " $1").trim()}:
+                          </div>
+                          <div className="skill-list">
+                            {value
+                              .filter((item) => item.trim() !== "")
+                              .join(", ")}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }
+                )}
+              </div>
+            </div>
+
+            <div className="section">
+              <h2 className="section-title">References</h2>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: "20px",
+                }}
+              >
+                {formData.references.map((ref, index) => (
+                  <div key={index} className="reference-item">
+                    <h3>{ref.name}</h3>
+                    <p>{ref.title}</p>
+                    <p>{ref.institution}</p>
+                    <p>Email: {ref.email}</p>
+                    <p>Phone: {ref.phone}</p>
+                    <p>{ref.address}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-300 my-4"></div>
-
-        <section className="mb-6">
-          <h2 className="text-xl font-bold uppercase mb-2">Objectives</h2>
-          <p className="text-sm">
-            {formData.objective || "Your career objectives will appear here."}
-          </p>
-        </section>
-
-        <div className="border-t border-gray-300 my-4"></div>
-
-        <section className="mb-6">
-          <h2 className="text-xl font-bold uppercase mb-2">Education</h2>
-          {formData.education.map((edu, index) => (
-            <div key={index} className="mb-4">
-              <div className="flex justify-between">
-                <div>
-                  <h3 className="font-bold">{edu.school || "School Name"}</h3>
-                  <p className="text-sm">
-                    {edu.degree || "Degree"} – {edu.major || "Major"}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm">{edu.location || "Location"}</p>
-                  <p className="text-sm">{edu.period || "Period"}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        <div className="border-t border-gray-300 my-4"></div>
-
-        <section className="mb-6">
-          <h2 className="text-xl font-bold uppercase mb-2">Work Experience</h2>
-          {formData.workExperience.map((work, index) => (
-            <div key={index} className="mb-4">
-              <div className="flex justify-between mb-1">
-                <h3 className="font-bold">{work.company || "Company Name"}</h3>
-                <p className="text-sm">{work.period || "Period"}</p>
-              </div>
-              <p className="font-semibold mb-1">{work.title || "Position"}</p>
-              <ul className="list-disc pl-5">
-                {work.responsibilities.map((resp, rIndex) => (
-                  <li key={rIndex} className="text-sm">
-                    {resp || "Responsibility"}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </section>
-
-        <div className="border-t border-gray-300 my-4"></div>
-
-        <section className="mb-6">
-          <h2 className="text-xl font-bold uppercase mb-2">Skills</h2>
-
-          {/* Programming Languages */}
-          {hasSkills("programmingLanguage") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Programming Languages:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.programmingLanguage
-                  .filter((skill) => skill.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Web Technologies */}
-          {hasSkills("webTechnologies") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Web Technologies:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.webTechnologies
-                  .filter((tech) => tech.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Developer Tools */}
-          {hasSkills("developerTools") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Developer Tools:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.developerTools
-                  .filter((tool) => tool.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Languages */}
-          {hasSkills("languages") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Languages:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.languages
-                  .filter((lang) => lang.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Soft Skills */}
-          {hasSkills("softSkills") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Soft Skills:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.softSkills
-                  .filter((skill) => skill.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Industry Knowledge */}
-          {hasSkills("industryKnowledge") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Industry Knowledge:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.industryKnowledge
-                  .filter((knowledge) => knowledge.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Tools & Software */}
-          {hasSkills("tools") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Tools & Software:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.tools
-                  .filter((tool) => tool.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-
-          {/* Certifications */}
-          {hasSkills("certifications") && (
-            <div className="mb-3">
-              <h3 className="font-semibold">Certifications:</h3>
-              <p className="text-sm">
-                {formData.technicalSkills.certifications
-                  .filter((cert) => cert.trim() !== "")
-                  .join(", ")}
-              </p>
-            </div>
-          )}
-        </section>
-
-        <div className="border-t border-gray-300 my-4"></div>
-
-        <section className="mb-6">
-          <h2 className="text-xl font-bold uppercase mb-2">References</h2>
-          {formData.references.map((ref, index) => (
-            <div key={index} className="mb-4">
-              <h3 className="font-bold">{ref.name || "Reference Name"}</h3>
-              <p className="text-sm">{ref.title || "Title"}</p>
-              <p className="text-sm">{ref.institution || "Institution"}</p>
-              <p className="text-sm">Email: {ref.email || "Email"}</p>
-              <p className="text-sm">Phone: {ref.phone || "Phone"}</p>
-              <p className="text-sm">{ref.address || "Address"}</p>
-            </div>
-          ))}
-        </section>
-
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-end gap-4 mt-6">
+          <button
+            onClick={handleDownloadPDF}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Download PDF
+          </button>
           <button
             onClick={onClose}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+            className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
           >
             Close Preview
           </button>
