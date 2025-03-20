@@ -1,6 +1,6 @@
 import React from "react";
 
-const ResumePreview = ({ formData, photoPreview, setShowPreview }) => {
+const ResumePreview = ({ formData, photoPreview, onClose }) => {
   // Helper function to check if a skill category has any non-empty values
   const hasSkills = (category) => {
     return formData.technicalSkills[category].some(
@@ -215,10 +215,10 @@ const ResumePreview = ({ formData, photoPreview, setShowPreview }) => {
 
         <div className="flex justify-end mt-6">
           <button
-            onClick={() => setShowPreview(false)}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            onClick={onClose}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
           >
-            Close
+            Close Preview
           </button>
         </div>
       </div>

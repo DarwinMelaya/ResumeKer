@@ -1,5 +1,107 @@
 import React, { useState } from "react";
 import ResumePreview from "../components/Home/ResumePreview";
+import { motion } from "framer-motion";
+import { HiOutlineDocumentAdd, HiOutlinePhotograph } from "react-icons/hi";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
+
+const STEPS = {
+  PERSONAL: 0,
+  OBJECTIVE: 1,
+  EDUCATION: 2,
+  EXPERIENCE: 3,
+  SKILLS: 4,
+  REFERENCES: 5,
+  REVIEW: 6,
+};
+
+const StepIndicator = ({ currentStep, totalSteps }) => (
+  <div className="relative mb-12">
+    <div className="flex items-center justify-between mb-8">
+      {Array.from({ length: totalSteps }, (_, i) => (
+        <motion.div
+          key={i}
+          className="flex flex-col items-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.1 }}
+        >
+          <div
+            className={`
+            w-10 h-10 rounded-full flex items-center justify-center
+            transition-all duration-300 ease-in-out
+            ${
+              i === currentStep
+                ? "bg-blue-600 text-white shadow-lg scale-110"
+                : i < currentStep
+                ? "bg-green-500 text-white"
+                : "bg-gray-100 text-gray-400"
+            }
+          `}
+          >
+            {i + 1}
+          </div>
+          <span
+            className={`
+            mt-2 text-sm font-medium
+            ${
+              i === currentStep
+                ? "text-blue-600"
+                : i < currentStep
+                ? "text-green-500"
+                : "text-gray-400"
+            }
+          `}
+          >
+            {Object.keys(STEPS)[i].toLowerCase()}
+          </span>
+        </motion.div>
+      ))}
+      <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-100 -z-10" />
+    </div>
+  </div>
+);
+
+const InputField = ({
+  label,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  className = "",
+}) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={`
+        w-full px-4 py-2 rounded-lg border border-gray-200
+        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+        transition-all duration-200 ease-in-out
+        ${className}
+      `}
+    />
+  </div>
+);
+
+const StepContainer = ({ children, title, subtitle }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    className="bg-white rounded-xl shadow-sm p-8"
+  >
+    <div className="mb-8">
+      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+      {subtitle && <p className="mt-2 text-gray-600">{subtitle}</p>}
+    </div>
+    {children}
+  </motion.div>
+);
 
 const Home = () => {
   const [formData, setFormData] = useState({
@@ -56,6 +158,16 @@ const Home = () => {
 
   const [showPreview, setShowPreview] = useState(false);
   const [photoPreview, setPhotoPreview] = useState(null);
+
+  const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
+
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, STEPS.REVIEW));
+  };
+
+  const handleBack = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, STEPS.PERSONAL));
+  };
 
   const handleAddItem = (section) => {
     setFormData((prev) => ({
@@ -175,308 +287,463 @@ const Home = () => {
     });
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      {showPreview && (
-        <ResumePreview
-          formData={formData}
-          photoPreview={photoPreview}
-          setShowPreview={setShowPreview}
-        />
-      )}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-        <div className="mb-8 flex justify-between items-start border-b pb-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="FULL NAME"
-              className="text-3xl font-bold w-full mb-4"
-              value={formData.personalInfo.fullName}
+  const renderStep = () => {
+    switch (currentStep) {
+      case STEPS.PERSONAL:
+        return renderPersonalStep();
+
+      case STEPS.OBJECTIVE:
+        return (
+          <StepContainer
+            title="Career Objective"
+            subtitle="Tell us about your career goals"
+          >
+            <textarea
+              className="w-full p-2 border rounded min-h-[100px]"
+              placeholder="Enter your career objective..."
+              value={formData.objective}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  personalInfo: {
-                    ...prev.personalInfo,
-                    fullName: e.target.value,
-                  },
+                  objective: e.target.value,
                 }))
               }
             />
-            <div className="space-y-2">
-              <input
-                type="text"
-                placeholder="Address"
-                className="w-full"
-                value={formData.personalInfo.address}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    personalInfo: {
-                      ...prev.personalInfo,
-                      address: e.target.value,
-                    },
-                  }))
-                }
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                className="w-full"
-                value={formData.personalInfo.phone}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    personalInfo: {
-                      ...prev.personalInfo,
-                      phone: e.target.value,
-                    },
-                  }))
-                }
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full"
-                value={formData.personalInfo.email}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    personalInfo: {
-                      ...prev.personalInfo,
-                      email: e.target.value,
-                    },
-                  }))
-                }
-              />
-              <input
-                type="url"
-                placeholder="GitHub URL"
-                className="w-full"
-                value={formData.personalInfo.github}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    personalInfo: {
-                      ...prev.personalInfo,
-                      github: e.target.value,
-                    },
-                  }))
-                }
-              />
-            </div>
-          </div>
-          <div className="w-32 h-40 border-2 border-dashed flex items-center justify-center relative overflow-hidden">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="photo-upload"
-              onChange={handlePhotoUpload}
-            />
-            {photoPreview ? (
-              <>
-                <img
-                  src={photoPreview}
-                  alt="Profile preview"
-                  className="w-full h-full object-cover absolute inset-0"
-                />
-                <label
-                  htmlFor="photo-upload"
-                  className="cursor-pointer text-center text-white bg-black bg-opacity-50 absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                >
-                  Change Photo
-                </label>
-              </>
-            ) : (
-              <label
-                htmlFor="photo-upload"
-                className="cursor-pointer text-center text-gray-500"
-              >
-                Upload Photo
-              </label>
-            )}
-          </div>
-        </div>
+          </StepContainer>
+        );
 
-        {/* Objectives Section */}
-        <section className="mb-6">
-          <h2 className="text-xl font-bold mb-3">OBJECTIVES</h2>
-          <textarea
-            className="w-full p-2 border rounded min-h-[100px]"
-            placeholder="Enter your career objective..."
-            value={formData.objective}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                objective: e.target.value,
-              }))
-            }
-          />
-        </section>
-
-        {/* Education Section */}
-        <section className="mb-6">
-          <h2 className="text-xl font-bold mb-3">EDUCATION</h2>
-          {formData.education.map((edu, index) => (
-            <div key={index} className="mb-4 p-4 border rounded">
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="School Name"
-                  className="w-full p-2 border rounded"
-                  value={edu.school}
-                  onChange={(e) =>
-                    handleEducationChange(index, "school", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Location"
-                  className="w-full p-2 border rounded"
-                  value={edu.location}
-                  onChange={(e) =>
-                    handleEducationChange(index, "location", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Degree"
-                  className="w-full p-2 border rounded"
-                  value={edu.degree}
-                  onChange={(e) =>
-                    handleEducationChange(index, "degree", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Period"
-                  className="w-full p-2 border rounded"
-                  value={edu.period}
-                  onChange={(e) =>
-                    handleEducationChange(index, "period", e.target.value)
-                  }
-                />
-              </div>
-              {index > 0 && (
-                <button
-                  onClick={() => handleRemoveItem("education", index)}
-                  className="mt-2 text-red-500"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            onClick={() => handleAddItem("education")}
-            className="text-blue-500"
+      case STEPS.EDUCATION:
+        return (
+          <StepContainer
+            title="Education"
+            subtitle="Tell us about your educational background"
           >
-            + Add Education
-          </button>
-        </section>
-
-        {/* Work Experience Section */}
-        <section className="mb-6">
-          <h2 className="text-xl font-bold mb-3">WORK EXPERIENCE</h2>
-          {formData.workExperience.map((work, index) => (
-            <div key={index} className="mb-4 p-4 border rounded">
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Company/Organization"
-                  className="w-full p-2 border rounded"
-                  value={work.company}
-                  onChange={(e) =>
-                    handleWorkExperienceChange(index, "company", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Period"
-                  className="w-full p-2 border rounded"
-                  value={work.period}
-                  onChange={(e) =>
-                    handleWorkExperienceChange(index, "period", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Position"
-                  className="w-full p-2 border rounded col-span-2"
-                  value={work.title}
-                  onChange={(e) =>
-                    handleWorkExperienceChange(index, "title", e.target.value)
-                  }
-                />
-              </div>
-              <div className="mt-2">
-                <h4 className="font-semibold">Responsibilities:</h4>
-                {work.responsibilities.map((resp, rIndex) => (
+            {formData.education.map((edu, index) => (
+              <div key={index} className="mb-4 p-4 border rounded">
+                <div className="grid grid-cols-2 gap-4">
                   <input
-                    key={rIndex}
                     type="text"
-                    placeholder="Add responsibility"
-                    className="w-full p-2 border rounded mt-2"
-                    value={resp}
+                    placeholder="School Name"
+                    className="w-full p-2 border rounded"
+                    value={edu.school}
                     onChange={(e) =>
-                      handleResponsibilityChange(index, rIndex, e.target.value)
+                      handleEducationChange(index, "school", e.target.value)
                     }
                   />
-                ))}
-                <button
-                  className="mt-2 text-blue-500"
-                  onClick={() => {
-                    const newExp = [...formData.workExperience];
-                    newExp[index].responsibilities.push("");
-                    setFormData((prev) => ({
-                      ...prev,
-                      workExperience: newExp,
-                    }));
-                  }}
-                >
-                  + Add Responsibility
-                </button>
+                  <input
+                    type="text"
+                    placeholder="Location"
+                    className="w-full p-2 border rounded"
+                    value={edu.location}
+                    onChange={(e) =>
+                      handleEducationChange(index, "location", e.target.value)
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Degree"
+                    className="w-full p-2 border rounded"
+                    value={edu.degree}
+                    onChange={(e) =>
+                      handleEducationChange(index, "degree", e.target.value)
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Period"
+                    className="w-full p-2 border rounded"
+                    value={edu.period}
+                    onChange={(e) =>
+                      handleEducationChange(index, "period", e.target.value)
+                    }
+                  />
+                </div>
+                {index > 0 && (
+                  <button
+                    onClick={() => handleRemoveItem("education", index)}
+                    className="mt-2 text-red-500"
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
-              {index > 0 && (
-                <button
-                  onClick={() => handleRemoveItem("workExperience", index)}
-                  className="mt-2 text-red-500"
-                >
-                  Remove Experience
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            onClick={() => handleAddItem("workExperience")}
-            className="text-blue-500"
+            ))}
+            <button
+              onClick={() => handleAddItem("education")}
+              className="text-blue-500"
+            >
+              + Add Education
+            </button>
+          </StepContainer>
+        );
+
+      case STEPS.EXPERIENCE:
+        return (
+          <StepContainer
+            title="Work Experience"
+            subtitle="Tell us about your professional experience"
           >
-            + Add Work Experience
-          </button>
-        </section>
+            {formData.workExperience.map((work, index) => (
+              <div key={index} className="mb-4 p-4 border rounded">
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Company/Organization"
+                    className="w-full p-2 border rounded"
+                    value={work.company}
+                    onChange={(e) =>
+                      handleWorkExperienceChange(
+                        index,
+                        "company",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Period"
+                    className="w-full p-2 border rounded"
+                    value={work.period}
+                    onChange={(e) =>
+                      handleWorkExperienceChange(
+                        index,
+                        "period",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Position"
+                    className="w-full p-2 border rounded col-span-2"
+                    value={work.title}
+                    onChange={(e) =>
+                      handleWorkExperienceChange(index, "title", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="mt-2">
+                  <h4 className="font-semibold">Responsibilities:</h4>
+                  {work.responsibilities.map((resp, rIndex) => (
+                    <input
+                      key={rIndex}
+                      type="text"
+                      placeholder="Add responsibility"
+                      className="w-full p-2 border rounded mt-2"
+                      value={resp}
+                      onChange={(e) =>
+                        handleResponsibilityChange(
+                          index,
+                          rIndex,
+                          e.target.value
+                        )
+                      }
+                    />
+                  ))}
+                  <button
+                    className="mt-2 text-blue-500"
+                    onClick={() => {
+                      const newExp = [...formData.workExperience];
+                      newExp[index].responsibilities.push("");
+                      setFormData((prev) => ({
+                        ...prev,
+                        workExperience: newExp,
+                      }));
+                    }}
+                  >
+                    + Add Responsibility
+                  </button>
+                </div>
+                {index > 0 && (
+                  <button
+                    onClick={() => handleRemoveItem("workExperience", index)}
+                    className="mt-2 text-red-500"
+                  >
+                    Remove Experience
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() => handleAddItem("workExperience")}
+              className="text-blue-500"
+            >
+              + Add Work Experience
+            </button>
+          </StepContainer>
+        );
 
-        {/* Skills Section */}
-        <section className="mb-6">
-          <h2 className="text-xl font-bold mb-3">SKILLS</h2>
+      case STEPS.SKILLS:
+        return (
+          <StepContainer title="Skills" subtitle="Highlight your key skills">
+            <div className="space-y-6">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
 
-          {/* Technical Skills Group */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
+                <div className="mb-4">
+                  <h4 className="font-semibold mb-2">Programming Languages</h4>
+                  {formData.technicalSkills.programmingLanguage.map(
+                    (skill, index) => (
+                      <div key={index} className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          placeholder="Add programming language"
+                          className="w-full p-2 border rounded"
+                          value={skill}
+                          onChange={(e) =>
+                            handleSkillChange(
+                              "programmingLanguage",
+                              index,
+                              e.target.value
+                            )
+                          }
+                        />
+                        {index > 0 && (
+                          <button
+                            onClick={() =>
+                              handleRemoveSkill("programmingLanguage", index)
+                            }
+                            className="text-red-500"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    )
+                  )}
+                  <button
+                    onClick={() => handleAddSkill("programmingLanguage")}
+                    className="text-blue-500"
+                  >
+                    + Add Programming Language
+                  </button>
+                </div>
 
-            {/* Programming Languages */}
-            <div className="mb-4">
-              <h4 className="font-semibold mb-2">Programming Languages</h4>
-              {formData.technicalSkills.programmingLanguage.map(
-                (skill, index) => (
+                <div className="mb-4">
+                  <h4 className="font-semibold mb-2">Web Technologies</h4>
+                  {formData.technicalSkills.webTechnologies.map(
+                    (tech, index) => (
+                      <div key={index} className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          placeholder="Add web technology"
+                          className="w-full p-2 border rounded"
+                          value={tech}
+                          onChange={(e) =>
+                            handleSkillChange(
+                              "webTechnologies",
+                              index,
+                              e.target.value
+                            )
+                          }
+                        />
+                        {index > 0 && (
+                          <button
+                            onClick={() =>
+                              handleRemoveSkill("webTechnologies", index)
+                            }
+                            className="text-red-500"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    )
+                  )}
+                  <button
+                    onClick={() => handleAddSkill("webTechnologies")}
+                    className="text-blue-500"
+                  >
+                    + Add Web Technology
+                  </button>
+                </div>
+
+                <div className="mb-4">
+                  <h4 className="font-semibold mb-2">Developer Tools</h4>
+                  {formData.technicalSkills.developerTools.map(
+                    (tool, index) => (
+                      <div key={index} className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          placeholder="Add developer tool"
+                          className="w-full p-2 border rounded"
+                          value={tool}
+                          onChange={(e) =>
+                            handleSkillChange(
+                              "developerTools",
+                              index,
+                              e.target.value
+                            )
+                          }
+                        />
+                        {index > 0 && (
+                          <button
+                            onClick={() =>
+                              handleRemoveSkill("developerTools", index)
+                            }
+                            className="text-red-500"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    )
+                  )}
+                  <button
+                    onClick={() => handleAddSkill("developerTools")}
+                    className="text-blue-500"
+                  >
+                    + Add Developer Tool
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Languages</h3>
+                {formData.technicalSkills.languages.map((lang, index) => (
                   <div key={index} className="flex gap-2 mb-2">
                     <input
                       type="text"
-                      placeholder="Add programming language"
+                      placeholder="Add language and proficiency (e.g., English - Native)"
+                      className="w-full p-2 border rounded"
+                      value={lang}
+                      onChange={(e) =>
+                        handleSkillChange("languages", index, e.target.value)
+                      }
+                    />
+                    {index > 0 && (
+                      <button
+                        onClick={() => handleRemoveSkill("languages", index)}
+                        className="text-red-500"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => handleAddSkill("languages")}
+                  className="text-blue-500"
+                >
+                  + Add Language
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
+                {formData.technicalSkills.softSkills.map((skill, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Add soft skill (e.g., Leadership, Communication)"
                       className="w-full p-2 border rounded"
                       value={skill}
                       onChange={(e) =>
+                        handleSkillChange("softSkills", index, e.target.value)
+                      }
+                    />
+                    {index > 0 && (
+                      <button
+                        onClick={() => handleRemoveSkill("softSkills", index)}
+                        className="text-red-500"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => handleAddSkill("softSkills")}
+                  className="text-blue-500"
+                >
+                  + Add Soft Skill
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">
+                  Industry Knowledge
+                </h3>
+                {formData.technicalSkills.industryKnowledge.map(
+                  (knowledge, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        placeholder="Add industry-specific knowledge"
+                        className="w-full p-2 border rounded"
+                        value={knowledge}
+                        onChange={(e) =>
+                          handleSkillChange(
+                            "industryKnowledge",
+                            index,
+                            e.target.value
+                          )
+                        }
+                      />
+                      {index > 0 && (
+                        <button
+                          onClick={() =>
+                            handleRemoveSkill("industryKnowledge", index)
+                          }
+                          className="text-red-500"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  )
+                )}
+                <button
+                  onClick={() => handleAddSkill("industryKnowledge")}
+                  className="text-blue-500"
+                >
+                  + Add Industry Knowledge
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Tools & Software</h3>
+                {formData.technicalSkills.tools.map((tool, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Add tool or software proficiency"
+                      className="w-full p-2 border rounded"
+                      value={tool}
+                      onChange={(e) =>
+                        handleSkillChange("tools", index, e.target.value)
+                      }
+                    />
+                    {index > 0 && (
+                      <button
+                        onClick={() => handleRemoveSkill("tools", index)}
+                        className="text-red-500"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => handleAddSkill("tools")}
+                  className="text-blue-500"
+                >
+                  + Add Tool/Software
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Certifications</h3>
+                {formData.technicalSkills.certifications.map((cert, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Add certification"
+                      className="w-full p-2 border rounded"
+                      value={cert}
+                      onChange={(e) =>
                         handleSkillChange(
-                          "programmingLanguage",
+                          "certifications",
                           index,
                           e.target.value
                         )
@@ -485,7 +752,7 @@ const Home = () => {
                     {index > 0 && (
                       <button
                         onClick={() =>
-                          handleRemoveSkill("programmingLanguage", index)
+                          handleRemoveSkill("certifications", index)
                         }
                         className="text-red-500"
                       >
@@ -493,349 +760,287 @@ const Home = () => {
                       </button>
                     )}
                   </div>
-                )
-              )}
-              <button
-                onClick={() => handleAddSkill("programmingLanguage")}
-                className="text-blue-500"
-              >
-                + Add Programming Language
-              </button>
-            </div>
-
-            {/* Web Technologies */}
-            <div className="mb-4">
-              <h4 className="font-semibold mb-2">Web Technologies</h4>
-              {formData.technicalSkills.webTechnologies.map((tech, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Add web technology"
-                    className="w-full p-2 border rounded"
-                    value={tech}
-                    onChange={(e) =>
-                      handleSkillChange(
-                        "webTechnologies",
-                        index,
-                        e.target.value
-                      )
-                    }
-                  />
-                  {index > 0 && (
-                    <button
-                      onClick={() =>
-                        handleRemoveSkill("webTechnologies", index)
-                      }
-                      className="text-red-500"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                onClick={() => handleAddSkill("webTechnologies")}
-                className="text-blue-500"
-              >
-                + Add Web Technology
-              </button>
-            </div>
-
-            {/* Developer Tools */}
-            <div className="mb-4">
-              <h4 className="font-semibold mb-2">Developer Tools</h4>
-              {formData.technicalSkills.developerTools.map((tool, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Add developer tool"
-                    className="w-full p-2 border rounded"
-                    value={tool}
-                    onChange={(e) =>
-                      handleSkillChange("developerTools", index, e.target.value)
-                    }
-                  />
-                  {index > 0 && (
-                    <button
-                      onClick={() => handleRemoveSkill("developerTools", index)}
-                      className="text-red-500"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                onClick={() => handleAddSkill("developerTools")}
-                className="text-blue-500"
-              >
-                + Add Developer Tool
-              </button>
-            </div>
-          </div>
-
-          {/* Languages */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Languages</h3>
-            {formData.technicalSkills.languages.map((lang, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Add language and proficiency (e.g., English - Native)"
-                  className="w-full p-2 border rounded"
-                  value={lang}
-                  onChange={(e) =>
-                    handleSkillChange("languages", index, e.target.value)
-                  }
-                />
-                {index > 0 && (
-                  <button
-                    onClick={() => handleRemoveSkill("languages", index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => handleAddSkill("languages")}
-              className="text-blue-500"
-            >
-              + Add Language
-            </button>
-          </div>
-
-          {/* Soft Skills */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
-            {formData.technicalSkills.softSkills.map((skill, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Add soft skill (e.g., Leadership, Communication)"
-                  className="w-full p-2 border rounded"
-                  value={skill}
-                  onChange={(e) =>
-                    handleSkillChange("softSkills", index, e.target.value)
-                  }
-                />
-                {index > 0 && (
-                  <button
-                    onClick={() => handleRemoveSkill("softSkills", index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => handleAddSkill("softSkills")}
-              className="text-blue-500"
-            >
-              + Add Soft Skill
-            </button>
-          </div>
-
-          {/* Industry Knowledge */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Industry Knowledge</h3>
-            {formData.technicalSkills.industryKnowledge.map(
-              (knowledge, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Add industry-specific knowledge"
-                    className="w-full p-2 border rounded"
-                    value={knowledge}
-                    onChange={(e) =>
-                      handleSkillChange(
-                        "industryKnowledge",
-                        index,
-                        e.target.value
-                      )
-                    }
-                  />
-                  {index > 0 && (
-                    <button
-                      onClick={() =>
-                        handleRemoveSkill("industryKnowledge", index)
-                      }
-                      className="text-red-500"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              )
-            )}
-            <button
-              onClick={() => handleAddSkill("industryKnowledge")}
-              className="text-blue-500"
-            >
-              + Add Industry Knowledge
-            </button>
-          </div>
-
-          {/* Tools & Software */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Tools & Software</h3>
-            {formData.technicalSkills.tools.map((tool, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Add tool or software proficiency"
-                  className="w-full p-2 border rounded"
-                  value={tool}
-                  onChange={(e) =>
-                    handleSkillChange("tools", index, e.target.value)
-                  }
-                />
-                {index > 0 && (
-                  <button
-                    onClick={() => handleRemoveSkill("tools", index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => handleAddSkill("tools")}
-              className="text-blue-500"
-            >
-              + Add Tool/Software
-            </button>
-          </div>
-
-          {/* Certifications */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Certifications</h3>
-            {formData.technicalSkills.certifications.map((cert, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Add certification"
-                  className="w-full p-2 border rounded"
-                  value={cert}
-                  onChange={(e) =>
-                    handleSkillChange("certifications", index, e.target.value)
-                  }
-                />
-                {index > 0 && (
-                  <button
-                    onClick={() => handleRemoveSkill("certifications", index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => handleAddSkill("certifications")}
-              className="text-blue-500"
-            >
-              + Add Certification
-            </button>
-          </div>
-        </section>
-
-        {/* References Section */}
-        <section className="mb-6">
-          <h2 className="text-xl font-bold mb-3">REFERENCES</h2>
-          {formData.references.map((ref, index) => (
-            <div key={index} className="mb-4 p-4 border rounded">
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  className="w-full p-2 border rounded"
-                  value={ref.name}
-                  onChange={(e) =>
-                    handleReferenceChange(index, "name", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Title"
-                  className="w-full p-2 border rounded"
-                  value={ref.title}
-                  onChange={(e) =>
-                    handleReferenceChange(index, "title", e.target.value)
-                  }
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="w-full p-2 border rounded"
-                  value={ref.email}
-                  onChange={(e) =>
-                    handleReferenceChange(index, "email", e.target.value)
-                  }
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone"
-                  className="w-full p-2 border rounded"
-                  value={ref.phone}
-                  onChange={(e) =>
-                    handleReferenceChange(index, "phone", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Institution"
-                  className="w-full p-2 border rounded"
-                  value={ref.institution}
-                  onChange={(e) =>
-                    handleReferenceChange(index, "institution", e.target.value)
-                  }
-                />
-                <input
-                  type="text"
-                  placeholder="Address"
-                  className="w-full p-2 border rounded"
-                  value={ref.address}
-                  onChange={(e) =>
-                    handleReferenceChange(index, "address", e.target.value)
-                  }
-                />
-              </div>
-              {index > 0 && (
+                ))}
                 <button
-                  onClick={() => handleRemoveItem("references", index)}
-                  className="mt-2 text-red-500"
+                  onClick={() => handleAddSkill("certifications")}
+                  className="text-blue-500"
                 >
-                  Remove Reference
+                  + Add Certification
                 </button>
-              )}
+              </div>
             </div>
-          ))}
-          <button
-            onClick={() => handleAddItem("references")}
-            className="text-blue-500"
-          >
-            + Add Reference
-          </button>
-        </section>
+          </StepContainer>
+        );
 
-        {/* Preview & Export Buttons */}
-        <div className="flex justify-center space-x-4">
-          <button
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-            onClick={() => setShowPreview(true)}
+      case STEPS.REFERENCES:
+        return (
+          <StepContainer
+            title="References"
+            subtitle="List your professional references"
           >
-            Preview Resume
-          </button>
-          <button
-            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-            onClick={() => console.log("Export")}
+            {formData.references.map((ref, index) => (
+              <div key={index} className="mb-4 p-4 border rounded">
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    className="w-full p-2 border rounded"
+                    value={ref.name}
+                    onChange={(e) =>
+                      handleReferenceChange(index, "name", e.target.value)
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Title"
+                    className="w-full p-2 border rounded"
+                    value={ref.title}
+                    onChange={(e) =>
+                      handleReferenceChange(index, "title", e.target.value)
+                    }
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    className="w-full p-2 border rounded"
+                    value={ref.email}
+                    onChange={(e) =>
+                      handleReferenceChange(index, "email", e.target.value)
+                    }
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone"
+                    className="w-full p-2 border rounded"
+                    value={ref.phone}
+                    onChange={(e) =>
+                      handleReferenceChange(index, "phone", e.target.value)
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Institution"
+                    className="w-full p-2 border rounded"
+                    value={ref.institution}
+                    onChange={(e) =>
+                      handleReferenceChange(
+                        index,
+                        "institution",
+                        e.target.value
+                      )
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    className="w-full p-2 border rounded"
+                    value={ref.address}
+                    onChange={(e) =>
+                      handleReferenceChange(index, "address", e.target.value)
+                    }
+                  />
+                </div>
+                {index > 0 && (
+                  <button
+                    onClick={() => handleRemoveItem("references", index)}
+                    className="mt-2 text-red-500"
+                  >
+                    Remove Reference
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() => handleAddItem("references")}
+              className="text-blue-500"
+            >
+              + Add Reference
+            </button>
+          </StepContainer>
+        );
+
+      case STEPS.REVIEW:
+        return (
+          <StepContainer
+            title="Review Your Resume"
+            subtitle="Make sure everything is correct"
           >
-            Export PDF
-          </button>
+            {showPreview ? (
+              <ResumePreview
+                formData={formData}
+                photoPreview={photoPreview}
+                onClose={() => setShowPreview(false)}
+              />
+            ) : (
+              <div className="space-y-6">
+                <p className="text-gray-600">
+                  Click the button below to preview your resume before
+                  exporting.
+                </p>
+                <button
+                  onClick={() => setShowPreview(true)}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg
+                    hover:bg-blue-700 transition-colors"
+                >
+                  Preview Resume
+                </button>
+              </div>
+            )}
+          </StepContainer>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const renderPersonalStep = () => (
+    <StepContainer
+      title="Personal Information"
+      subtitle="Let's start with your basic information"
+    >
+      <div className="grid grid-cols-2 gap-6">
+        <div className="col-span-2">
+          <InputField
+            label="Full Name"
+            value={formData.personalInfo.fullName}
+            onChange={(e) =>
+              handlePersonalInfoChange("fullName", e.target.value)
+            }
+            placeholder="e.g., John Doe"
+            className="text-2xl font-semibold"
+          />
+        </div>
+        <InputField
+          label="Email"
+          type="email"
+          value={formData.personalInfo.email}
+          onChange={(e) => handlePersonalInfoChange("email", e.target.value)}
+          placeholder="e.g., john@example.com"
+        />
+        <InputField
+          label="Phone"
+          type="tel"
+          value={formData.personalInfo.phone}
+          onChange={(e) => handlePersonalInfoChange("phone", e.target.value)}
+          placeholder="e.g., +1 234 567 890"
+        />
+        <div className="col-span-2">
+          <InputField
+            label="Address"
+            value={formData.personalInfo.address}
+            onChange={(e) =>
+              handlePersonalInfoChange("address", e.target.value)
+            }
+            placeholder="e.g., 123 Main St, City, Country"
+          />
+        </div>
+        <div className="col-span-2">
+          <div className="flex items-start gap-6">
+            <div className="flex-1">
+              <InputField
+                label="GitHub Profile"
+                type="url"
+                value={formData.personalInfo.github}
+                onChange={(e) =>
+                  handlePersonalInfoChange("github", e.target.value)
+                }
+                placeholder="e.g., https://github.com/johndoe"
+              />
+            </div>
+            <div className="w-40">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Profile Photo
+              </label>
+              <div className="relative h-40 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                  id="photo-upload"
+                />
+                {photoPreview ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={photoPreview}
+                      alt="Profile"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <label
+                      htmlFor="photo-upload"
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white opacity-0 hover:opacity-100 transition-opacity rounded-lg cursor-pointer"
+                    >
+                      Change Photo
+                    </label>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="photo-upload"
+                    className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+                  >
+                    <HiOutlinePhotograph className="w-8 h-8 mb-2" />
+                    <span className="text-sm">Upload Photo</span>
+                  </label>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </StepContainer>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Build Your Professional Resume
+          </h1>
+          <p className="text-lg text-gray-600">
+            Create a standout resume in minutes with our step-by-step builder
+          </p>
+        </div>
+
+        <StepIndicator
+          currentStep={currentStep}
+          totalSteps={Object.keys(STEPS).length}
+        />
+
+        {renderStep()}
+
+        <div className="flex justify-between mt-8">
+          {currentStep > STEPS.PERSONAL && (
+            <button
+              onClick={handleBack}
+              className="flex items-center px-6 py-3 bg-white text-gray-700 rounded-lg
+                shadow-sm hover:bg-gray-50 transition-colors border border-gray-200"
+            >
+              <FiChevronLeft className="w-5 h-5 mr-2" />
+              Back
+            </button>
+          )}
+
+          {currentStep < STEPS.REVIEW ? (
+            <button
+              onClick={handleNext}
+              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg
+                shadow-sm hover:bg-blue-700 transition-colors ml-auto"
+            >
+              Next
+              <FiChevronRight className="w-5 h-5 ml-2" />
+            </button>
+          ) : (
+            <button
+              onClick={() => console.log("Export")}
+              className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg
+                shadow-sm hover:bg-green-700 transition-colors ml-auto"
+            >
+              <HiOutlineDocumentAdd className="w-5 h-5 mr-2" />
+              Export PDF
+            </button>
+          )}
         </div>
       </div>
     </div>
