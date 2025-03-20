@@ -35,13 +35,14 @@ const ResumePreview = ({ formData, photoPreview, onClose }) => {
               .resume-content {
                 width: 210mm;
                 min-height: 297mm;
-                padding: 20mm;
-                margin: 0;
+                padding: 15mm;
+                margin: 0 auto;
                 font-family: 'Helvetica', 'Arial', sans-serif;
                 line-height: 1.6;
                 color: #2d3748;
                 box-sizing: border-box;
                 background-color: white;
+                position: relative;
               }
 
               .header {
@@ -49,7 +50,7 @@ const ResumePreview = ({ formData, photoPreview, onClose }) => {
                 justify-content: space-between;
                 align-items: flex-start;
                 margin-bottom: 6mm;
-                border-bottom: 2px solid #3182ce;
+                border-bottom: 2px solid #000000;
                 padding-bottom: 6mm;
               }
 
@@ -204,6 +205,10 @@ const ResumePreview = ({ formData, photoPreview, onClose }) => {
 
               @media print {
                 .resume-content {
+                  width: 210mm;
+                  min-height: 297mm;
+                  padding: 15mm;
+                  margin: 0;
                   -webkit-print-color-adjust: exact;
                   print-color-adjust: exact;
                 }

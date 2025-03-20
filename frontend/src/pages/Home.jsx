@@ -31,9 +31,9 @@ const StepIndicator = ({ currentStep, totalSteps }) => (
             transition-all duration-300 ease-in-out
             ${
               i === currentStep
-                ? "bg-blue-600 text-white shadow-lg scale-110"
+                ? "bg-gray-900 text-white shadow-lg scale-110"
                 : i < currentStep
-                ? "bg-green-500 text-white"
+                ? "bg-gray-700 text-white"
                 : "bg-gray-100 text-gray-400"
             }
           `}
@@ -45,9 +45,9 @@ const StepIndicator = ({ currentStep, totalSteps }) => (
             mt-2 text-sm font-medium
             ${
               i === currentStep
-                ? "text-blue-600"
+                ? "text-gray-900"
                 : i < currentStep
-                ? "text-green-500"
+                ? "text-gray-700"
                 : "text-gray-400"
             }
           `}
@@ -56,7 +56,7 @@ const StepIndicator = ({ currentStep, totalSteps }) => (
           </span>
         </motion.div>
       ))}
-      <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-100 -z-10" />
+      <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-200 -z-10" />
     </div>
   </div>
 );
@@ -80,23 +80,30 @@ const InputField = ({
       placeholder={placeholder}
       className={`
         w-full px-4 py-2 rounded-lg border border-gray-200
-        focus:ring-2 focus:ring-blue-500 focus:border-transparent
-        transition-all duration-200 ease-in-out
+        focus:ring-2 focus:ring-gray-900 focus:border-transparent
+        transition-all duration-200 ease-in-out bg-white
         ${className}
       `}
     />
   </div>
 );
 
+const buttonStyles = {
+  primary: "bg-gray-900 text-white hover:bg-gray-800",
+  secondary: "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50",
+  danger: "text-red-500 hover:text-red-600",
+  link: "text-gray-900 hover:text-gray-700",
+};
+
 const StepContainer = ({ children, title, subtitle }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -20 }}
-    className="bg-white rounded-xl shadow-sm p-8"
+    className="bg-white rounded-xl shadow-sm p-8 border border-gray-100"
   >
     <div className="mb-8">
-      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+      <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
       {subtitle && <p className="mt-2 text-gray-600">{subtitle}</p>}
     </div>
     {children}
@@ -104,6 +111,7 @@ const StepContainer = ({ children, title, subtitle }) => (
 );
 
 const Home = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     personalInfo: {
       fullName: "",
@@ -161,8 +169,11 @@ const Home = () => {
 
   const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
     setCurrentStep((prev) => Math.min(prev + 1, STEPS.REVIEW));
+    setIsLoading(false);
   };
 
   const handleBack = () => {
@@ -892,8 +903,8 @@ const Home = () => {
                   </p>
                   <button
                     onClick={() => setShowPreview(true)}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg
-                      hover:bg-blue-700 transition-colors inline-flex items-center"
+                    className={`${buttonStyles.primary} px-6 py-3 rounded-lg
+                      transition-colors inline-flex items-center`}
                   >
                     <HiOutlineDocumentAdd className="w-5 h-5 mr-2" />
                     Preview Resume
@@ -967,7 +978,7 @@ const Home = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Profile Photo
               </label>
-              <div className="relative h-40 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors">
+              <div className="relative h-40 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-900 transition-colors">
                 <input
                   type="file"
                   accept="image/*"
@@ -1007,7 +1018,7 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -1029,8 +1040,8 @@ const Home = () => {
           {currentStep > STEPS.PERSONAL && (
             <button
               onClick={handleBack}
-              className="flex items-center px-6 py-3 bg-white text-gray-700 rounded-lg
-                shadow-sm hover:bg-gray-50 transition-colors border border-gray-200"
+              className={`flex items-center px-6 py-3 rounded-lg
+                shadow-sm transition-colors ${buttonStyles.secondary}`}
             >
               <FiChevronLeft className="w-5 h-5 mr-2" />
               Back
@@ -1040,11 +1051,42 @@ const Home = () => {
           {currentStep < STEPS.REVIEW && (
             <button
               onClick={handleNext}
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg
-                shadow-sm hover:bg-blue-700 transition-colors ml-auto"
+              disabled={isLoading}
+              className={`flex items-center px-6 py-3 rounded-lg
+                shadow-sm transition-colors ml-auto ${buttonStyles.primary}
+                disabled:opacity-70 disabled:cursor-not-allowed min-w-[120px]
+                justify-center`}
             >
-              Next
-              <FiChevronRight className="w-5 h-5 ml-2" />
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  <span>Next...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span>Next</span>
+                  <FiChevronRight className="w-5 h-5" />
+                </div>
+              )}
             </button>
           )}
         </div>
