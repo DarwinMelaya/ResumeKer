@@ -1,6 +1,13 @@
 import React from "react";
 
 const ResumePreview = ({ formData, photoPreview, setShowPreview }) => {
+  // Helper function to check if a skill category has any non-empty values
+  const hasSkills = (category) => {
+    return formData.technicalSkills[category].some(
+      (skill) => skill.trim() !== ""
+    );
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white max-w-4xl w-full mx-auto p-8 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
@@ -91,28 +98,103 @@ const ResumePreview = ({ formData, photoPreview, setShowPreview }) => {
         <div className="border-t border-gray-300 my-4"></div>
 
         <section className="mb-6">
-          <h2 className="text-xl font-bold uppercase mb-2">Technical Skills</h2>
-          <div className="mb-3">
-            <h3 className="font-semibold">Programming Languages:</h3>
-            <p className="text-sm">
-              {formData.technicalSkills.programmingLanguage.join(", ") ||
-                "None listed"}
-            </p>
-          </div>
-          <div className="mb-3">
-            <h3 className="font-semibold">Web Technologies:</h3>
-            <p className="text-sm">
-              {formData.technicalSkills.webTechnologies.join(", ") ||
-                "None listed"}
-            </p>
-          </div>
-          <div className="mb-3">
-            <h3 className="font-semibold">Developer Tools:</h3>
-            <p className="text-sm">
-              {formData.technicalSkills.developerTools.join(", ") ||
-                "None listed"}
-            </p>
-          </div>
+          <h2 className="text-xl font-bold uppercase mb-2">Skills</h2>
+
+          {/* Programming Languages */}
+          {hasSkills("programmingLanguage") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Programming Languages:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.programmingLanguage
+                  .filter((skill) => skill.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Web Technologies */}
+          {hasSkills("webTechnologies") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Web Technologies:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.webTechnologies
+                  .filter((tech) => tech.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Developer Tools */}
+          {hasSkills("developerTools") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Developer Tools:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.developerTools
+                  .filter((tool) => tool.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Languages */}
+          {hasSkills("languages") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Languages:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.languages
+                  .filter((lang) => lang.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Soft Skills */}
+          {hasSkills("softSkills") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Soft Skills:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.softSkills
+                  .filter((skill) => skill.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Industry Knowledge */}
+          {hasSkills("industryKnowledge") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Industry Knowledge:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.industryKnowledge
+                  .filter((knowledge) => knowledge.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Tools & Software */}
+          {hasSkills("tools") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Tools & Software:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.tools
+                  .filter((tool) => tool.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {hasSkills("certifications") && (
+            <div className="mb-3">
+              <h3 className="font-semibold">Certifications:</h3>
+              <p className="text-sm">
+                {formData.technicalSkills.certifications
+                  .filter((cert) => cert.trim() !== "")
+                  .join(", ")}
+              </p>
+            </div>
+          )}
         </section>
 
         <div className="border-t border-gray-300 my-4"></div>

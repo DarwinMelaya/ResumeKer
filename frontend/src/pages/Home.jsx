@@ -34,6 +34,11 @@ const Home = () => {
       programmingLanguage: [""],
       webTechnologies: [""],
       developerTools: [""],
+      languages: [""],
+      softSkills: [""],
+      industryKnowledge: [""],
+      tools: [""],
+      certifications: [""],
       videoEditing: false,
       graphicDesign: false,
     },
@@ -454,20 +459,63 @@ const Home = () => {
         <section className="mb-6">
           <h2 className="text-xl font-bold mb-3">SKILLS</h2>
 
-          {/* Programming Languages */}
-          <div className="mb-4">
-            <h3 className="font-semibold mb-2">Programming Languages</h3>
-            {formData.technicalSkills.programmingLanguage.map(
-              (skill, index) => (
+          {/* Technical Skills Group */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
+
+            {/* Programming Languages */}
+            <div className="mb-4">
+              <h4 className="font-semibold mb-2">Programming Languages</h4>
+              {formData.technicalSkills.programmingLanguage.map(
+                (skill, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Add programming language"
+                      className="w-full p-2 border rounded"
+                      value={skill}
+                      onChange={(e) =>
+                        handleSkillChange(
+                          "programmingLanguage",
+                          index,
+                          e.target.value
+                        )
+                      }
+                    />
+                    {index > 0 && (
+                      <button
+                        onClick={() =>
+                          handleRemoveSkill("programmingLanguage", index)
+                        }
+                        className="text-red-500"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                )
+              )}
+              <button
+                onClick={() => handleAddSkill("programmingLanguage")}
+                className="text-blue-500"
+              >
+                + Add Programming Language
+              </button>
+            </div>
+
+            {/* Web Technologies */}
+            <div className="mb-4">
+              <h4 className="font-semibold mb-2">Web Technologies</h4>
+              {formData.technicalSkills.webTechnologies.map((tech, index) => (
                 <div key={index} className="flex gap-2 mb-2">
                   <input
                     type="text"
-                    placeholder="Add programming language"
+                    placeholder="Add web technology"
                     className="w-full p-2 border rounded"
-                    value={skill}
+                    value={tech}
                     onChange={(e) =>
                       handleSkillChange(
-                        "programmingLanguage",
+                        "webTechnologies",
                         index,
                         e.target.value
                       )
@@ -476,7 +524,143 @@ const Home = () => {
                   {index > 0 && (
                     <button
                       onClick={() =>
-                        handleRemoveSkill("programmingLanguage", index)
+                        handleRemoveSkill("webTechnologies", index)
+                      }
+                      className="text-red-500"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                onClick={() => handleAddSkill("webTechnologies")}
+                className="text-blue-500"
+              >
+                + Add Web Technology
+              </button>
+            </div>
+
+            {/* Developer Tools */}
+            <div className="mb-4">
+              <h4 className="font-semibold mb-2">Developer Tools</h4>
+              {formData.technicalSkills.developerTools.map((tool, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Add developer tool"
+                    className="w-full p-2 border rounded"
+                    value={tool}
+                    onChange={(e) =>
+                      handleSkillChange("developerTools", index, e.target.value)
+                    }
+                  />
+                  {index > 0 && (
+                    <button
+                      onClick={() => handleRemoveSkill("developerTools", index)}
+                      className="text-red-500"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                onClick={() => handleAddSkill("developerTools")}
+                className="text-blue-500"
+              >
+                + Add Developer Tool
+              </button>
+            </div>
+          </div>
+
+          {/* Languages */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Languages</h3>
+            {formData.technicalSkills.languages.map((lang, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Add language and proficiency (e.g., English - Native)"
+                  className="w-full p-2 border rounded"
+                  value={lang}
+                  onChange={(e) =>
+                    handleSkillChange("languages", index, e.target.value)
+                  }
+                />
+                {index > 0 && (
+                  <button
+                    onClick={() => handleRemoveSkill("languages", index)}
+                    className="text-red-500"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() => handleAddSkill("languages")}
+              className="text-blue-500"
+            >
+              + Add Language
+            </button>
+          </div>
+
+          {/* Soft Skills */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
+            {formData.technicalSkills.softSkills.map((skill, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Add soft skill (e.g., Leadership, Communication)"
+                  className="w-full p-2 border rounded"
+                  value={skill}
+                  onChange={(e) =>
+                    handleSkillChange("softSkills", index, e.target.value)
+                  }
+                />
+                {index > 0 && (
+                  <button
+                    onClick={() => handleRemoveSkill("softSkills", index)}
+                    className="text-red-500"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() => handleAddSkill("softSkills")}
+              className="text-blue-500"
+            >
+              + Add Soft Skill
+            </button>
+          </div>
+
+          {/* Industry Knowledge */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Industry Knowledge</h3>
+            {formData.technicalSkills.industryKnowledge.map(
+              (knowledge, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Add industry-specific knowledge"
+                    className="w-full p-2 border rounded"
+                    value={knowledge}
+                    onChange={(e) =>
+                      handleSkillChange(
+                        "industryKnowledge",
+                        index,
+                        e.target.value
+                      )
+                    }
+                  />
+                  {index > 0 && (
+                    <button
+                      onClick={() =>
+                        handleRemoveSkill("industryKnowledge", index)
                       }
                       className="text-red-500"
                     >
@@ -487,62 +671,30 @@ const Home = () => {
               )
             )}
             <button
-              onClick={() => handleAddSkill("programmingLanguage")}
+              onClick={() => handleAddSkill("industryKnowledge")}
               className="text-blue-500"
             >
-              + Add Programming Language
+              + Add Industry Knowledge
             </button>
           </div>
 
-          {/* Web Technologies */}
-          <div className="mb-4">
-            <h3 className="font-semibold mb-2">Web Technologies</h3>
-            {formData.technicalSkills.webTechnologies.map((tech, index) => (
+          {/* Tools & Software */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Tools & Software</h3>
+            {formData.technicalSkills.tools.map((tool, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <input
                   type="text"
-                  placeholder="Add web technology"
-                  className="w-full p-2 border rounded"
-                  value={tech}
-                  onChange={(e) =>
-                    handleSkillChange("webTechnologies", index, e.target.value)
-                  }
-                />
-                {index > 0 && (
-                  <button
-                    onClick={() => handleRemoveSkill("webTechnologies", index)}
-                    className="text-red-500"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={() => handleAddSkill("webTechnologies")}
-              className="text-blue-500"
-            >
-              + Add Web Technology
-            </button>
-          </div>
-
-          {/* Developer Tools */}
-          <div className="mb-4">
-            <h3 className="font-semibold mb-2">Developer Tools</h3>
-            {formData.technicalSkills.developerTools.map((tool, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Add developer tool"
+                  placeholder="Add tool or software proficiency"
                   className="w-full p-2 border rounded"
                   value={tool}
                   onChange={(e) =>
-                    handleSkillChange("developerTools", index, e.target.value)
+                    handleSkillChange("tools", index, e.target.value)
                   }
                 />
                 {index > 0 && (
                   <button
-                    onClick={() => handleRemoveSkill("developerTools", index)}
+                    onClick={() => handleRemoveSkill("tools", index)}
                     className="text-red-500"
                   >
                     Remove
@@ -551,10 +703,42 @@ const Home = () => {
               </div>
             ))}
             <button
-              onClick={() => handleAddSkill("developerTools")}
+              onClick={() => handleAddSkill("tools")}
               className="text-blue-500"
             >
-              + Add Developer Tool
+              + Add Tool/Software
+            </button>
+          </div>
+
+          {/* Certifications */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">Certifications</h3>
+            {formData.technicalSkills.certifications.map((cert, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Add certification"
+                  className="w-full p-2 border rounded"
+                  value={cert}
+                  onChange={(e) =>
+                    handleSkillChange("certifications", index, e.target.value)
+                  }
+                />
+                {index > 0 && (
+                  <button
+                    onClick={() => handleRemoveSkill("certifications", index)}
+                    className="text-red-500"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() => handleAddSkill("certifications")}
+              className="text-blue-500"
+            >
+              + Add Certification
             </button>
           </div>
         </section>
