@@ -1,35 +1,40 @@
-import React, { useRef } from "react";
-import { usePDF } from "react-to-pdf";
+import React, { useRef, useState } from "react";
 
 const ResumePreview = ({ formData, photoPreview, onClose }) => {
   const targetRef = useRef(null);
-  const { toPDF, targetRef: pdfRef } = usePDF({
-    filename: `${formData.personalInfo.fullName || "Resume"}.pdf`,
-    page: {
-      format: "a4",
-      orientation: "portrait",
-      margin: 0,
-    },
-    method: "save",
-  });
+  const [paperSize, setPaperSize] = useState("a4");
 
-  const handleDownloadPDF = async () => {
-    try {
-      await toPDF();
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white max-w-4xl w-full mx-auto p-8 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <div ref={pdfRef} style={{ backgroundColor: "white" }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto print:p-0 print:bg-white">
+      <div className="bg-white max-w-4xl w-full mx-auto p-8 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto print:shadow-none print:max-h-none print:overflow-visible">
+        <div ref={targetRef} style={{ backgroundColor: "white" }}>
           <style>
             {`
               @page {
                 margin: 0;
-                size: A4;
+                size: ${paperSize};
+              }
+              
+              @media print {
+                body * {
+                  visibility: hidden;
+                }
+                .resume-content, .resume-content * {
+                  visibility: visible;
+                }
+                .resume-content {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  width: 100%;
+                }
+                .no-print {
+                  display: none !important;
+                }
               }
               
               .resume-content {
@@ -332,12 +337,21 @@ const ResumePreview = ({ formData, photoPreview, onClose }) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 mt-6">
+        <div className="flex justify-end gap-4 mt-6 no-print">
+          <select
+            value={paperSize}
+            onChange={(e) => setPaperSize(e.target.value)}
+            className="px-4 py-2 border rounded"
+          >
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+            <option value="legal">Legal</option>
+          </select>
           <button
-            onClick={handleDownloadPDF}
+            onClick={handlePrint}
             className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Download PDF
+            Print
           </button>
           <button
             onClick={onClose}

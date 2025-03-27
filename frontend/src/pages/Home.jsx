@@ -169,6 +169,8 @@ const Home = () => {
 
   const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
 
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+
   const handleNext = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 800));
@@ -197,6 +199,7 @@ const Home = () => {
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setIsPhotoUploading(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result);
@@ -207,6 +210,7 @@ const Home = () => {
             photo: file,
           },
         }));
+        setIsPhotoUploading(false);
       };
       reader.readAsDataURL(file);
     }
@@ -986,7 +990,12 @@ const Home = () => {
                   className="hidden"
                   id="photo-upload"
                 />
-                {photoPreview ? (
+                {isPhotoUploading ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="w-8 h-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <span className="text-sm text-gray-600">Uploading...</span>
+                  </div>
+                ) : photoPreview ? (
                   <div className="relative w-full h-full">
                     <img
                       src={photoPreview}
