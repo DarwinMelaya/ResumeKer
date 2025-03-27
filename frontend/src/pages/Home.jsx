@@ -20,18 +20,18 @@ const StepIndicator = ({ currentStep, totalSteps }) => (
       {Array.from({ length: totalSteps }, (_, i) => (
         <motion.div
           key={i}
-          className="flex flex-col items-center"
+          className="flex flex-col items-center group cursor-help"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1 }}
         >
           <div
             className={`
-            w-10 h-10 rounded-full flex items-center justify-center
+            w-12 h-12 rounded-full flex items-center justify-center
             transition-all duration-300 ease-in-out
             ${
               i === currentStep
-                ? "bg-gray-900 text-white shadow-lg scale-110"
+                ? "bg-gray-900 text-white shadow-lg scale-110 ring-4 ring-gray-200"
                 : i < currentStep
                 ? "bg-gray-700 text-white"
                 : "bg-gray-100 text-gray-400"
@@ -42,7 +42,7 @@ const StepIndicator = ({ currentStep, totalSteps }) => (
           </div>
           <span
             className={`
-            mt-2 text-sm font-medium
+            mt-2 text-sm font-medium whitespace-nowrap
             ${
               i === currentStep
                 ? "text-gray-900"
@@ -54,9 +54,12 @@ const StepIndicator = ({ currentStep, totalSteps }) => (
           >
             {Object.keys(STEPS)[i].toLowerCase()}
           </span>
+          <div className="absolute invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 -bottom-8">
+            Step {i + 1} of {totalSteps}
+          </div>
         </motion.div>
       ))}
-      <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-200 -z-10" />
+      <div className="absolute top-6 left-0 w-full h-[2px] bg-gray-200 -z-10" />
     </div>
   </div>
 );
@@ -68,6 +71,7 @@ const InputField = ({
   onChange,
   placeholder,
   className = "",
+  helper,
 }) => (
   <div className="mb-4">
     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -82,9 +86,11 @@ const InputField = ({
         w-full px-4 py-2 rounded-lg border border-gray-200
         focus:ring-2 focus:ring-gray-900 focus:border-transparent
         transition-all duration-200 ease-in-out bg-white
+        hover:border-gray-300
         ${className}
       `}
     />
+    {helper && <p className="mt-1 text-sm text-gray-500">{helper}</p>}
   </div>
 );
 
@@ -100,11 +106,17 @@ const StepContainer = ({ children, title, subtitle }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -20 }}
-    className="bg-white rounded-xl shadow-sm p-8 border border-gray-100"
+    className="bg-white rounded-xl shadow-sm p-8 border border-gray-100 hover:shadow-md transition-shadow"
   >
     <div className="mb-8">
-      <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-      {subtitle && <p className="mt-2 text-gray-600">{subtitle}</p>}
+      <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        {title}
+        {subtitle && (
+          <span className="text-sm font-normal text-gray-500 ml-2">
+            ({subtitle})
+          </span>
+        )}
+      </h2>
     </div>
     {children}
   </motion.div>
@@ -939,6 +951,7 @@ const Home = () => {
             }
             placeholder="e.g., John Doe"
             className="text-2xl font-semibold"
+            helper="Enter your full name as you'd like it to appear on your resume"
           />
         </div>
         <InputField
@@ -947,6 +960,7 @@ const Home = () => {
           value={formData.personalInfo.email}
           onChange={(e) => handlePersonalInfoChange("email", e.target.value)}
           placeholder="e.g., john@example.com"
+          helper="Use a professional email address"
         />
         <InputField
           label="Phone"
@@ -1028,6 +1042,10 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <ProgressIndicator
+        currentStep={currentStep}
+        totalSteps={Object.keys(STEPS).length}
+      />
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -1103,5 +1121,16 @@ const Home = () => {
     </div>
   );
 };
+
+const ProgressIndicator = ({ currentStep, totalSteps }) => (
+  <div className="fixed top-0 left-0 w-full h-1 bg-gray-100">
+    <motion.div
+      className="h-full bg-gray-900"
+      initial={{ width: 0 }}
+      animate={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+      transition={{ duration: 0.3 }}
+    />
+  </div>
+);
 
 export default Home;
